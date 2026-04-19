@@ -36,13 +36,30 @@ const TaskCard = ({ task, fetchTasks }) => {
   const isOverdue =
     task.deadline && task.status !== "completed" && new Date(task.deadline) < new Date();
 
+  const formatDeadline = (value) => {
+    const parsedDate = new Date(value);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "Invalid date";
+    }
+
+    return parsedDate.toLocaleDateString(undefined, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  };
+
   return (
     <div
       className={`mb-3 rounded-2xl border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${cardTone}`}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3 className="text-lg font-bold text-slate-800">{task.title}</h3>
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <h3 className="break-words text-base font-bold text-slate-800 sm:text-lg">
+          {task.title}
+        </h3>
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <span
             className={`rounded-full border px-2.5 py-1 text-xs font-semibold capitalize ${statusTone}`}
           >
@@ -63,13 +80,21 @@ const TaskCard = ({ task, fetchTasks }) => {
       ) : null}
 
       {task.deadline && (
-        <p
-          className={`mt-3 text-sm font-medium ${
-            isOverdue ? "text-red-600" : "text-slate-500"
+        <div
+          className={`mt-3 flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium sm:text-sm ${
+            isOverdue
+              ? "border-red-200 bg-red-50 text-red-700"
+              : "border-slate-200 bg-slate-50 text-slate-600"
           }`}
         >
-          Deadline: {new Date(task.deadline).toDateString()}
-        </p>
+          <span className="font-semibold uppercase tracking-wide">Deadline</span>
+          <time className="break-words">{formatDeadline(task.deadline)}</time>
+          {isOverdue ? (
+            <span className="rounded-full border border-red-200 bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-600">
+              Overdue
+            </span>
+          ) : null}
+        </div>
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
